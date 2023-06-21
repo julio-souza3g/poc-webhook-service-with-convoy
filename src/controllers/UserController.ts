@@ -1,7 +1,7 @@
 import { FastifyReply, FastifyRequest } from "fastify";
-import { Controller, POST } from "fastify-decorators";
+import { Controller, DELETE, POST } from "fastify-decorators";
 
-import { handleUserCreatedEvent } from "../services/eventHandler";
+import { handleUserEvent } from "../services/eventHandler";
 
 interface CreateUserRequestBody {
   name: string;
@@ -47,10 +47,44 @@ export default class UserController {
 
         // calls the event handler
         if (user) {
-          await handleUserCreatedEvent(user);
+          await handleUserEvent(user, "user.created");
         }
 
         return reply.status(201).send(user);
+      } catch (error) {
+        console.error(error);
+        return reply.status(500).send({ error: "Internal server error" });
+      }
+    }
+
+    @DELETE({ url: "/:id" })
+    async deleteUser(request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) {
+      try {
+        const { id } = request.params;
+
+        // check if user exists
+        const user = await this.prisma.user.findUnique({
+          where: {
+            id: parseInt(id),
+          },
+        });
+
+        if (!user) {
+          return reply.status(404).send({ error: "User not found" });
+        }
+
+        await this.prisma.user.update({
+          where: {
+            id: parseInt(id),
+          },
+          data: {
+            deletedAt: new Date(),
+          },
+        });
+
+        // calls the event handler
+        await handleUserEvent(user, "user.deleted");
+        return reply.status(200).send({ message: "User deleted successfully" });
       } catch (error) {
         console.error(error);
         return reply.status(500).send({ error: "Internal server error" });

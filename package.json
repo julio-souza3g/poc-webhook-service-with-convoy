@@ -1,0 +1,28 @@
+{
+  "name": "webhook-service",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "@fastify/formbody": "^7.4.0",
+    "@prisma/client": "^4.15.0",
+    "axios": "^1.4.0",
+    "convoy.js": "^1.0.2",
+    "dotenv": "^16.3.1",
+    "fastify": "^4.18.0",
+    "fastify-cli": "^5.7.1",
+    "fastify-decorators": "^3.15.0",
+    "prisma": "^4.15.0",
+    "typescript": "^5.1.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20.3.1",
+    "ts-node": "^10.9.1",
+    "ts-node-dev": "^2.0.0"
+  }
+}
